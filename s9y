@@ -77,7 +77,11 @@ fi
 
 # s9y exec: Execute Python, possibly with virtual env
 function subcmd_exec() {
-    singularity exec "$S9Y_EXEC_OPTIONS" "$S9Y_CONTAINER" "$@"
+    if [[ ! -v S9Y_EXEC_OPTIONS ]]; then
+        singularity exec "$S9Y_CONTAINER" "$@"
+    else
+        singularity exec "$S9Y_EXEC_OPTIONS" "$S9Y_CONTAINER" "$@"
+    fi
 }
 
 # s9y py: Execute Python, possibly with virtual env
@@ -85,12 +89,12 @@ function subcmd_py() {
     if [ -v S9Y_VENV ]; then
         info "S9Y_VENV found, use $S9Y_VENV for executing Python script"
         cmd=". $S9Y_VENV/bin/activate && python $*"
-        singularity exec "$S9Y_EXEC_OPTIONS" "$S9Y_CONTAINER" bash -c "$CMD"
+        subcmd_exec bash -c "$CMD"
     else
         warn "S9Y_VENV was not found.\n        " \
              "Executing a Python script without a virtualenv can affect" \
              "your local environment."
-        singularity exec "$S9Y_EXEC_OPTIONS" "$S9Y_CONTAINER" python "$@"
+        subcmd_exec python "$@"
     fi
 }
 
@@ -109,8 +113,7 @@ function subcmd_venv() {
             venv_name=$S9Y_VENV
         fi
         info "Creating Python virtual env $venv_name"
-        singularity exec "$S9Y_EXEC_OPTIONS" "$S9Y_CONTAINER" \
-                    python -m venv "$venv_name" --system-site-package
+        subcmd_exec python -m venv "$venv_name" --system-site-package
         exit $?
     fi
     if [[ ! -v S9Y_VENV ]]; then
@@ -118,13 +121,8 @@ function subcmd_venv() {
     fi
     info "S9Y_VENV found, use $S9Y_VENV for executing Python script"
     cmd=". $S9Y_VENV/bin/activate && $*"
-    singularity exec "$S9Y_EXEC_OPTIONS" "$S9Y_CONTAINER" bash -c "$cmd"
+    subcmd_exec bash -c "$cmd"
 }
-
-# Set options
-if [[ ! -v S9Y_EXEC_OPTIONS ]]; then
-    readonly S9Y_EXEC_OPTIONS=""
-fi
 
 # Entry point: dispatch to any of sub command
 readonly SUB_CMD=$1
