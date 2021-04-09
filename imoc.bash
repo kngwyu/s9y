@@ -3,7 +3,6 @@ if [ -d $HOME/imoc ]; then
     exit 0
 fi
 
-orig_dir=$PWD
 mkdir $HOME/imoc && cd $HOME/imoc
 
 git clone git@github.com:kngwyu/private-experiments.git && \
@@ -12,12 +11,11 @@ git clone git@github.com:kngwyu/private-experiments.git && \
     git clone git@github.com:kngwyu/intrinsic-rewards.git && \
     git clone git@github.com:kngwyu/rlpy3.git
 
-echo $DEFAULT_CONTAINER
+echo 'export S9Y_CONTAINER="$HOME/singularity-containers/py38-torch181-cuda111-mujoco200.sif"' >> .s9y-env
+echo 'export S9Y_VENV="$HOME/imoc/.imoc-venv"' >> .s9y-env
 
-if [ -v DEFAULT_CONTAINER ]; then
-    singularity exec $DEFAULT_CONTAINER bash $orig_dir/setup-singularity-venv.bash \
-                mujoco-maze \
-                Rainy \
-                intrinsic-rewards \
-                rlpy3
-fi
+s9y venv --create
+s9y venv pip install -e file://mujoco-maze
+s9y venv pip install -e file://Rainy
+s9y venv pip install -e file://intrinsic-rewards
+s9y venv pip install -e file://rlpy3
