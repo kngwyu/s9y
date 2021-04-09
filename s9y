@@ -38,7 +38,8 @@ function show_help() {
     echo    "Also, you can set S9Y_EXEC_OPTION for specifying options."
     echo    ""
     echo -e "${GREEN}Subcommands${NC}: \n"
-    echo    "    exec  Execture any command. Wrapper of singularity exec"
+    echo    "    exec  Execture any command. Wrapper of singularity exec."
+    echo    "    shell Enter the login shell of image. Wrapper of singularity shell."
     echo    "    py    Execute a python program, possibly with virtualenv,"
     echo    "          specified by S9Y_VENV."
     echo    "    venv  Execute any command (e.g., pip) in a virtualenv."
@@ -75,7 +76,7 @@ if [[ ! -v S9Y_CONTAINER ]]; then
     abort "S9Y_CONTAINER is not set"
 fi
 
-# s9y exec: Execute Python, possibly with virtual env
+# s9y exec: Wrapper of singularity exec
 function subcmd_exec() {
     if [[ ! -v S9Y_EXEC_OPTIONS ]]; then
         singularity exec "$S9Y_CONTAINER" "$@"
@@ -116,6 +117,19 @@ function subcmd_py() {
         subcmd_exec python "$@"
     fi
 }
+
+# s9y shell: Wrapper of singularity shell
+function subcmd_shell() {
+    if [[ ! -v S9Y_EXEC_OPTIONS ]]; then
+        singularity shell "$S9Y_CONTAINER" "$@"
+    else
+        if [[ ! "$(declare -p S9Y_EXEC_OPTIONS)" =~ "declare -a" ]]; then
+            abort "S9Y_EXEC_OPTIONS must be array: e.g., S9Y_EXEC_OPTIONS=(-nv)"
+        fi
+        singularity shell "${S9Y_EXEC_OPTIONS[@]}" "$S9Y_CONTAINER" "$@"
+    fi
+}
+
 
 # s9y venv: Execute Python, possibly with virtual env
 function subcmd_venv() {
