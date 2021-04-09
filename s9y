@@ -80,7 +80,10 @@ function subcmd_exec() {
     if [[ ! -v S9Y_EXEC_OPTIONS ]]; then
         singularity exec "$S9Y_CONTAINER" "$@"
     else
-        singularity exec "$S9Y_EXEC_OPTIONS" "$S9Y_CONTAINER" "$@"
+        if [[ ! "$(declare -p S9Y_EXEC_OPTIONS)" =~ "declare -a" ]]; then
+            abort "S9Y_EXEC_OPTIONS must be array: e.g., S9Y_EXEC_OPTIONS=(-nv)"
+        fi
+        singularity exec "${S9Y_EXEC_OPTIONS[@]}" "$S9Y_CONTAINER" "$@"
     fi
 }
 
