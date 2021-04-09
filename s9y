@@ -9,118 +9,129 @@ NC="\033[0m"
 
 # Show info
 function info() {
-    printf "${BLUE}INFO:${NC} $*\n"
+    echo -e "${BLUE}INFO:${NC} $*"
 }
 
 # Show warning
 function warn() {
-    printf "${YELLOW}WARNING:${NC} $*\n"
+    echo -e "${YELLOW}WARNING:${NC} $*"
 }
 
 # Exit after showing an error
 function abort() {
-    printf "${RED}ERROR:${NC} $*\n"
+    echo -e "${RED}ERROR:${NC} $*"
     exit 1
+}
+
+# s9
+readonly CMD_NAME=$(basename "$0")
+
+# Show help
+function show_help() {
+    echo -e "${BLUE}Usage${NC}: $CMD_NAME <subcommand> [options]\n"
+    if [[ -v S9Y_CONTAINER ]]; then
+        echo "$S9Y_CONTAINER is used as the container."
+    else
+        echo "$CMD_NAME needs S9Y_CONTAINER set."
+    fi
+    echo    "Please set it in .s9y-env or an init file for shell (e.g., .bashrc)"
+    echo    "Also, you can set S9Y_EXEC_OPTION for specifying options."
+    echo    ""
+    echo -e "${GREEN}Subcommands${NC}: \n"
+    echo    "    exec  Execture any command. Wrapper of singularity exec"
+    echo    "    py    Execute a python program, possibly with virtualenv,"
+    echo    "          specified by S9Y_VENV."
+    echo    "    venv  Execute any command (e.g., pip) in a virtualenv."
+    echo    ""
+    echo    "For help with each subcommand, run $CMD_NAME <subcommand> -h|--help"
 }
 
 # First, find .s9y-env and source it
 
-EXECUTING_DIR=$PWD
+readonly EXECUTING_DIR=$PWD
 
-while [ $PWD != "/" ]; do
-    if [ -f ".s9y-env" ]; then
+while [[ $PWD != "/" ]]; do
+    if [[ -f ".s9y-env" ]]; then
         source ".s9y-env"
         break
     fi
     cd ..
 done
 
-if [ $PWD == "/" ]; then
+if [[ $PWD == "/" ]]; then
     warn ".s9y-env was not found"
 fi
 
-cd $EXECUTING_DIR
+cd "$EXECUTING_DIR" || abort "cd failed"
+
+# Show help if no arguments were supplied
+if [[ $# -eq 0 ]]; then
+    show_help
+    exit 0
+fi
 
 # Ensure that $S9Y_CONTAINER exists
-if [ ! -v S9Y_CONTAINER ]; then
+if [[ ! -v S9Y_CONTAINER ]]; then
     abort "S9Y_CONTAINER is not set"
 fi
 
-CMD_NAME=$(basename $0)
-
-# Show help
-function show_help {
-    printf "${BLUE}Usage${NC}: $CMD_NAME <subcommand> [options]\n\n"
-    printf "$CMD_NAME needs S9Y_CONTAINER set.\n"
-    printf "Please set it in .s9y-env or an init file for shell (e.g., .bashrc)\n"
-    printf "Also, you can set S9Y_EXEC_OPTION for specifying options.\n"
-    printf "${GREEN}Subcommands${NC}: \n"
-    printf "    exec  Execture any command. Wrapper of singularity exec\n\n"
-    printf "    py    Execute a python program, possibly with virtualenv, \n"
-    printf "          specified by S9Y_VENV. \n"
-    printf "    venv  Execute any command (e.g., pip) in a virtualenv. \n"
-    printf "For help with each subcommand, run $CMD_NAME <subcommand> -h|--help\n\n"
-}
-
-VENV_CMD=". $S9Y_VENV/bin/activate && "
-
 # s9y exec: Execute Python, possibly with virtual env
-function subcmd_exec {
-    singularity exec $S9Y_EXEC_OPTIONS $S9Y_CONTAINER $@
+function subcmd_exec() {
+    singularity exec "$S9Y_EXEC_OPTIONS" "$S9Y_CONTAINER" "$@"
 }
 
 # s9y py: Execute Python, possibly with virtual env
-function subcmd_py {
+function subcmd_py() {
     if [ -v S9Y_VENV ]; then
         info "S9Y_VENV found, use $S9Y_VENV for executing Python script"
-        CMD=${VENV_CMD}"python $*"
-        singularity exec $S9Y_EXEC_OPTIONS $S9Y_CONTAINER bash -c $CMD
+        cmd=". $S9Y_VENV/bin/activate && python $*"
+        singularity exec "$S9Y_EXEC_OPTIONS" "$S9Y_CONTAINER" bash -c "$CMD"
     else
         warn "S9Y_VENV was not found.\n        " \
              "Executing a Python script without a virtualenv can affect" \
              "your local environment."
-        singularity exec $S9Y_EXEC_OPTIONS $S9Y_CONTAINER python $@
+        singularity exec "$S9Y_EXEC_OPTIONS" "$S9Y_CONTAINER" python "$@"
     fi
 }
 
 # s9y venv: Execute Python, possibly with virtual env
-function subcmd_venv {
-    if [ ! -z $1 ] && [ $1 = "--create" ]; then
-        if [ ! -v S9Y_VENV ]; then
-            if [ -z $2 ]; then
+function subcmd_venv() {
+    if [[ -n $1 ]] && [[ $1 = "--create" ]]; then
+        if [[ ! -v S9Y_VENV ]]; then
+            if [[ -z $2 ]]; then
                 abort "Specify the name of venv: e.g., s9y venv --create .s9y-venv"
             fi
-            VENV_NAME=$2
+            venv_name=$2
         else
-            if [ ! -z $2 ]; then
+            if [[ -n $2 ]]; then
                 warn "$S9Y_VENV is specified. $2 is ignored"
             fi
-            VENV_NAME=$S9Y_VENV
+            venv_name=$S9Y_VENV
         fi
-        info "Creating Python virtual env $VENV_NAME"
-        singularity exec $S9Y_EXEC_OPTIONS $S9Y_CONTAINER \
-                    python -m venv $S9Y_VENV --system-site-package
+        info "Creating Python virtual env $venv_name"
+        singularity exec "$S9Y_EXEC_OPTIONS" "$S9Y_CONTAINER" \
+                    python -m venv "$venv_name" --system-site-package
         exit $?
     fi
-    if [ ! -v S9Y_VENV ]; then
+    if [[ ! -v S9Y_VENV ]]; then
         abort "$CMD_NAME venv needs S9Y_VENV set."
     fi
     info "S9Y_VENV found, use $S9Y_VENV for executing Python script"
-    CMD=${VENV_CMD}"$*"
-    singularity exec $S9Y_EXEC_OPTIONS $S9Y_CONTAINER bash -c $CMD
+    cmd=". $S9Y_VENV/bin/activate && $*"
+    singularity exec "$S9Y_EXEC_OPTIONS" "$S9Y_CONTAINER" bash -c "$cmd"
 }
 
 # Entry point: dispatch to any of sub command
-SUB_COMMAND=$1
-case $SUB_COMMAND in
+readonly SUB_CMD=$1
+case $SUB_CMD in
     "" | "-h" | "--help" | "help")
         show_help
         ;;
     *)
         shift
-        subcmd_${SUB_COMMAND} $@
+        subcmd_"${SUB_CMD}" "$@"
         if [ $? = 127 ]; then
-            abort "$SUB_COMMAND is not a known subcommand. Run $CMD_NAME --help for usage."
+            abort "$SUB_CMD is not a known subcommand. Run $CMD_NAME --help for usage."
         fi
         ;;
 esac
