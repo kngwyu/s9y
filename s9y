@@ -77,7 +77,6 @@ fi
 
 # s9y exec: Execute Python, possibly with virtual env
 function subcmd_exec() {
-    echo "$@"
     if [[ ! -v S9Y_EXEC_OPTIONS ]]; then
         singularity exec "$S9Y_CONTAINER" "$@"
     else
