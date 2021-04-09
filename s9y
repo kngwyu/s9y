@@ -33,8 +33,8 @@ function show_help() {
         echo "$S9Y_CONTAINER is used as the container."
     else
         echo "$CMD_NAME needs S9Y_CONTAINER set."
+        echo "Please set it in .s9y-env or an init file for shell (e.g., .bashrc)"
     fi
-    echo    "Please set it in .s9y-env or an init file for shell (e.g., .bashrc)"
     echo    "Also, you can set S9Y_EXEC_OPTION for specifying options."
     echo    ""
     echo -e "${GREEN}Subcommands${NC}: \n"
@@ -120,6 +120,11 @@ function subcmd_venv() {
     cmd=". $S9Y_VENV/bin/activate && $*"
     singularity exec "$S9Y_EXEC_OPTIONS" "$S9Y_CONTAINER" bash -c "$cmd"
 }
+
+# Set options
+if [[ ! -v S9Y_EXEC_OPTIONS ]]; then
+    readonly S9Y_EXEC_OPTIONS=""
+fi
 
 # Entry point: dispatch to any of sub command
 readonly SUB_CMD=$1
