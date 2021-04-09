@@ -77,6 +77,7 @@ fi
 
 # s9y exec: Execute Python, possibly with virtual env
 function subcmd_exec() {
+    echo "$@"
     if [[ ! -v S9Y_EXEC_OPTIONS ]]; then
         singularity exec "$S9Y_CONTAINER" "$@"
     else
@@ -87,12 +88,28 @@ function subcmd_exec() {
     fi
 }
 
+# Helper function for venv
+function _venv_exec() {
+    src="source $S9Y_VENV/bin/activate &&"
+    # https://stackoverflow.com/a/8723305
+    for arg in "$@"; do
+        case "$arg" in
+            *\'*)
+                arg=$(printf "%s" "$arg" | sed "s/'/'\"'\"'/g")
+                ;;
+            *) : ;;
+        esac
+        src="$src '$arg'"
+    done
+    subcmd_exec bash -c "$src"
+}
+
 # s9y py: Execute Python, possibly with virtual env
 function subcmd_py() {
     if [ -v S9Y_VENV ]; then
         info "S9Y_VENV found, use $S9Y_VENV for executing Python script"
-        cmd=". $S9Y_VENV/bin/activate && python $*"
-        subcmd_exec bash -c "$CMD"
+        src="source $S9Y_VENV/bin/activate && python"
+        _venv_exec "python" "$@"
     else
         warn "S9Y_VENV was not found.\n        " \
              "Executing a Python script without a virtualenv can affect" \
@@ -123,8 +140,7 @@ function subcmd_venv() {
         abort "$CMD_NAME venv needs S9Y_VENV set."
     fi
     info "S9Y_VENV found, use $S9Y_VENV for executing Python script"
-    cmd=". $S9Y_VENV/bin/activate && $*"
-    subcmd_exec bash -c "$cmd"
+    _venv_exec "$@"
 }
 
 # Entry point: dispatch to any of sub command
