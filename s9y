@@ -111,7 +111,7 @@ function _venv_exec() {
 # s9y py: Execute Python, possibly with virtual env
 function subcmd_py() {
     if [ -v S9Y_VENV ]; then
-        info "S9Y_VENV found, use $S9Y_VENV for executing Python script"
+        info "S9Y_VENV found, use $S9Y_VENV for executing a Python script"
         src="source $S9Y_VENV/bin/activate && python"
         _venv_exec "python" "$@"
     else
@@ -156,7 +156,7 @@ function subcmd_venv() {
     if [[ ! -v S9Y_VENV ]]; then
         abort "$CMD_NAME venv needs S9Y_VENV set."
     fi
-    info "S9Y_VENV found, use $S9Y_VENV for executing Python script"
+    info "S9Y_VENV found, use $S9Y_VENV for executing a command"
     _venv_exec "$@"
 }
 

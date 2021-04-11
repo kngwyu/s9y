@@ -16,7 +16,7 @@ This file currently  supports three variables.
 
 ```bash:.s9y-env
 export S9Y_CONTAINER="my-container.sif"  # Path to your singularity container.
-export S9Y_VENV=".s9y-venv"  # Path to your Python virtualenv.
+export S9Y_VENV=".my-venv"  # Path to your Python virtualenv.
 export S9Y_EXEC_OPTIONS=(--nv)  # CLI options for singularity exec.
 ```
 
@@ -25,20 +25,20 @@ Then, you can use `s9y` under the all child directries.
 ```
 
 ❯ s9y venv --create
-INFO: Creating Python virtual env .s9y-venv
+INFO: Creating Python virtual env .my-venv
 
-❯ s9y exec ls .s9y-venv
+❯ s9y exec ls .my-venv
 bin  include  lib  lib64  pyvenv.cfg  share
 
 ❯ s9y venv pip install cowsay
-INFO: S9Y_VENV found, use .s9y-venv for executing Python script
+INFO: S9Y_VENV found, use .my-venv for executing Python script
 Collecting cowsay
   Downloading cowsay-3.0-py2.py3-none-any.whl (19 kB)
 Installing collected packages: cowsay
 Successfully installed cowsay-3.0
 
-❯ ./s9y py -c 'import cowsay; cowsay.cow(\'Hello World\')'
-INFO: S9Y_VENV found, use .s9y-venv for executing Python script
+❯ s9y py -c 'import cowsay; cowsay.cow(\'Hello World\')'
+INFO: S9Y_VENV found, use .my-venv for executing Python script
   ___________
 < Hello World >
   ===========
