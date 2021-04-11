@@ -35,7 +35,11 @@ function show_help() {
         echo "$CMD_NAME needs S9Y_CONTAINER set."
         echo "Please set it in .s9y-env or an init file for shell (e.g., .bashrc)"
     fi
-    echo    "Also, you can set S9Y_EXEC_OPTION for specifying options."
+    if [[ -v S9Y_EXEC_OPTIONS ]]; then
+        echo "Enabled options are " "${S9Y_EXEC_OPTIONS[@]}"
+    else
+        echo "Also, you can set S9Y_EXEC_OPTION for specifying options."
+    fi
     echo    ""
     echo -e "${GREEN}Subcommands${NC}: \n"
     echo    "    exec  Execture any command. Wrapper of singularity exec."
