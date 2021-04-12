@@ -1,5 +1,4 @@
 # s9y
-
 s9y is a thin wrapper for [singularity](https://sylabs.io/guides/3.7/user-guide/) container.
 
 ## Why?
@@ -14,8 +13,10 @@ Copy to a directiry in `$PATH` (e.g., `$HOME/.local/bin`).
 singularity, bash, and sed
 
 ## Usage
-Make your config file named `.s9y-env`.
-This file currently  supports three variables.
+Make your config file `.s9y-env`, under the directory you want to use
+singularity.
+
+`s9y` currently supports three variables set in this file:
 
 #### **`.s9y-env`**
 ```bash
