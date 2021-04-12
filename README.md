@@ -17,7 +17,8 @@ singularity, bash, and sed
 Make your config file named `.s9y-env`.
 This file currently  supports three variables.
 
-```bash:.s9y-env
+#### **`.s9y-env`**
+```bash
 export S9Y_CONTAINER="my-container.sif"  # Path to your singularity container.
 export S9Y_VENV=".my-venv"  # Path to your Python virtualenv.
 export S9Y_EXEC_OPTIONS=(--nv)  # CLI options for singularity exec.
@@ -25,7 +26,7 @@ export S9Y_EXEC_OPTIONS=(--nv)  # CLI options for singularity exec.
 
 Then, you can use `s9y` under the all child directries.
 
-```
+```bash
 ❯ s9y venv --create
 INFO: Creating Python virtual env .my-venv
 
