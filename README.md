@@ -3,12 +3,15 @@
 s9y is a thin wrapper for [singularity](https://sylabs.io/guides/3.7/user-guide/) container.
 
 ## Why?
-For shortening the commands and enabling the directory-specific
-configuration of containers, options, and Python virtualenvs.
+For shortening the commands and enabling directory-specific
+configurations of containers, CLI options, and Python virtualenvs.
 
 ## Install
 `s9y` is a standalone bash script.
 Copy to a directiry in `$PATH` (e.g., `$HOME/.local/bin`).
+
+### Dependecies
+singularity, bash, and sed
 
 ## Usage
 Make your config file named `.s9y-env`.
