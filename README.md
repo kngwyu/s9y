@@ -26,7 +26,6 @@ export S9Y_EXEC_OPTIONS=(--nv)  # CLI options for singularity exec.
 Then, you can use `s9y` under the all child directries.
 
 ```
-
 ❯ s9y venv --create
 INFO: Creating Python virtual env .my-venv
 
