@@ -61,12 +61,12 @@ Usage: s9y <subcommand> [options]
 
 Subcommands:
 
-    exec  Execture any command. Wrapper of singularity exec.
-    shell Enter the login shell of image. Wrapper of singularity shell.
-    py    Execute a python program, possibly with virtualenv,
-          specified by S9Y_VENV.
-    venv  Execute any command (e.g., pip) in a virtualenv.
+    exec  Execture any command. Wrapper of 'singularity exec.'
+    shell Enter the login shell of the container. Wrapper of 'singularity shell'.
+    py    Execute a Python program, possibly within
+          the virtualenv specified by S9Y_VENV.
+    venv  Execute any command (e.g., pip) in the virtualenv.
+          Equivalent to '. your-venv/bin/activate && ...'.
 
 For help with each subcommand, run s9y <subcommand> -h|--help
-
 ```
