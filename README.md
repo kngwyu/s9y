@@ -13,7 +13,7 @@ Copy to a directiry in `$PATH` (e.g., `$HOME/.local/bin`).
 singularity, bash, and sed
 
 ## Usage
-Make your config file `.s9y-env`, under the directory you want to use
+Place a config file named `.s9y-env` under the directory you want to use
 singularity.
 
 `s9y` currently supports three variables set in this file:
