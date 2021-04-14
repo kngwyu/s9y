@@ -25,6 +25,11 @@ export S9Y_VENV=".my-venv"  # Path to your Python virtualenv.
 export S9Y_EXEC_OPTIONS=(--nv)  # CLI options for singularity exec.
 ```
 
+This file is simply `source`d in the script, so you can set other
+env-vars.
+For example, `export SINGULARITY_BIND="$SSH_AUTH_SOCK"` would be
+helpful to use an SSH agent from a container.
+
 Then, you can use `s9y` under the all child directries.
 
 ```bash

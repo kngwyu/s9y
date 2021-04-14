@@ -92,10 +92,10 @@ function _ensure_s9y_exec_options_isarray() {
 function subcmd_exec() {
     case $1 in "" | "-h" | "--help")  _exec_show_help && exit 0 ;; *) esac
     if [[ ! -v S9Y_EXEC_OPTIONS ]]; then
-        singularity exec "$S9Y_CONTAINER" "$@"
+        singularity exec "$S9Y_CONTAINER" "$@" || exit $?
     else
         _ensure_s9y_exec_options_isarray
-        singularity exec "${S9Y_EXEC_OPTIONS[@]}" "$S9Y_CONTAINER" "$@"
+        singularity exec "${S9Y_EXEC_OPTIONS[@]}" "$S9Y_CONTAINER" "$@" || exit $?
     fi
 }
 
@@ -144,10 +144,10 @@ function _py_show_help() {
 function subcmd_shell() {
     case $1 in "-h" | "--help")  _exec_show_help && exit 0 ;; *) esac
     if [[ ! -v S9Y_EXEC_OPTIONS ]]; then
-        singularity shell "$S9Y_CONTAINER" "$@"
+        singularity shell "$S9Y_CONTAINER" "$@" || exit $?
     else
         _ensure_s9y_exec_options_isarray
-        singularity shell "${S9Y_EXEC_OPTIONS[@]}" "$S9Y_CONTAINER" "$@"
+        singularity shell "${S9Y_EXEC_OPTIONS[@]}" "$S9Y_CONTAINER" "$@" || exit $?
     fi
 }
 
@@ -183,7 +183,6 @@ function _venv_create() {
         fi
         info "Creating Python virtual env $S9Y_VENV"
         subcmd_exec python -m venv "$S9Y_VENV" "$@"
-        exit $?
     else
         abort "Specify the name of venv by S9Y_VENV."
     fi
