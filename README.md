@@ -6,8 +6,9 @@ For shortening the commands and enabling directory-specific
 configurations of containers, CLI options, and Python virtualenvs.
 
 ## Install
-`s9y` is a standalone bash script.
-Copy to a directiry in `$PATH` (e.g., `$HOME/.local/bin`).
+`s9y` is a standalone bash script, so simply copy to a directiry in `$PATH`.
+E.g., if you use `$HOME/.local/bin`, run
+`wget -O $HOME/.local/bin/s9y https://git.io/JOsUn && chmod +x $HOME/.local/bin/s9y`.
 
 ### Dependecies
 singularity, bash, and sed

@@ -182,6 +182,10 @@ function _venv_create() {
             abort "$S9Y_VENV already exists. Manually delete the directory first."
         fi
         info "Creating Python virtual env $S9Y_VENV"
+        if [[ ! "$*" =~ "--system-site-packages"  ]]; then
+            warn "--system-site-packages is not used," \
+                 "so the resulting venv cannot access to system packages"
+        fi
         subcmd_exec python -m venv "$S9Y_VENV" "$@"
     else
         abort "Specify the name of venv by S9Y_VENV."
