@@ -120,18 +120,24 @@ function _exec_show_help() {
     echo    "Execture any command. Wrapper of 'singularity exec.'"
 }
 
-# s9y py: Execute Python, possibly with virtual env
-function subcmd_py() {
+# s9y python: Execute Python, possibly with virtual env
+function subcmd_python() {
     case $1 in "" | "-h" | "--help")  _py_show_help && exit 0 ;; *) esac
+    if [ -v S9Y_PYTHON ]; then
+        python=$S9Y_PYTHON
+    else
+        python="python"
+    fi
+
     if [ -v S9Y_VENV ]; then
         info "S9Y_VENV found, using $S9Y_VENV for executing a Python script"
         src="source $S9Y_VENV/bin/activate && python"
-        _venv_exec "python" "$@"
+        _venv_exec $python "$@"
     else
         warn "S9Y_VENV was not found.\n        " \
              "Executing a Python script without a virtualenv can affect" \
              "your local environment."
-        subcmd_exec python "$@"
+        subcmd_exec $python "$@"
     fi
 }
 

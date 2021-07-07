@@ -24,6 +24,7 @@ singularity.
 export S9Y_CONTAINER="my-container.sif"  # Path to your singularity container.
 export S9Y_VENV=".my-venv"  # Path to your Python virtualenv.
 export S9Y_EXEC_OPTIONS=(--nv)  # CLI options for singularity exec.
+export S9Y_PYTHON="python3"  # Name of Python executable used by s9y. Set "python" by default.
 ```
 
 This file is simply `source`d in the script, so you can set other
@@ -34,7 +35,7 @@ helpful to use an SSH agent from a container.
 Then, you can use `s9y` under the all child directries.
 
 ```bash
-❯ s9y venv --create
+❯ s9y venv --create --system-site-packages
 INFO: Creating Python virtual env .my-venv
 
 ❯ s9y exec ls .my-venv
@@ -47,7 +48,7 @@ Collecting cowsay
 Installing collected packages: cowsay
 Successfully installed cowsay-3.0
 
-❯ s9y py -c 'import cowsay; cowsay.cow(\'Hello World\')'
+❯ s9y python -c 'import cowsay; cowsay.cow(\'Hello World\')'
 INFO: S9Y_VENV found, use .my-venv for executing Python script
   ___________
 < Hello World >
@@ -69,7 +70,7 @@ Subcommands:
 
     exec  Execture any command. Wrapper of 'singularity exec.'
     shell Enter the login shell of the container. Wrapper of 'singularity shell'.
-    py    Execute a Python program, possibly within
+    python    Execute a Python program, possibly within
           the virtualenv specified by S9Y_VENV.
     venv  Execute any command (e.g., pip) in the virtualenv.
           Equivalent to '. your-venv/bin/activate && ...'.
