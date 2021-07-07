@@ -122,7 +122,7 @@ function _exec_show_help() {
 
 # s9y python: Execute Python, possibly with virtual env
 function subcmd_python() {
-    case $1 in "" | "-h" | "--help")  _py_show_help && exit 0 ;; *) esac
+    case $1 in "-h" | "--help")  _py_show_help && exit 0 ;; *) esac
     if [ -v S9Y_PYTHON ]; then
         python=$S9Y_PYTHON
     else
