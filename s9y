@@ -23,8 +23,9 @@ function abort() {
     exit 1
 }
 
-# s9
-readonly CMD_NAME=$(basename "$0")
+# Name of this command
+readonly CMD_NAME
+CMD_NAME=$(basename "$0")
 
 # Show help
 function show_help() {
@@ -35,11 +36,8 @@ function show_help() {
         echo "$CMD_NAME needs S9Y_CONTAINER set."
         echo "Please set it in .s9y-env or an init file for shell (e.g., .bashrc)"
     fi
-    if [[ -v S9Y_EXEC_OPTIONS ]]; then
-        echo "Enabled options are " "${S9Y_EXEC_OPTIONS[@]}"
-    else
-        echo "Also, you can set S9Y_EXEC_OPTION for specifying options."
-    fi
+    echo "Enabled global options: " "${S9Y_GLOBAL_OPTIONS[@]}"
+    echo "Enabled exec options: " "${S9Y_EXEC_OPTIONS[@]}"
     echo    ""
     echo -e "${GREEN}Subcommands${NC}:\n"
     echo    "    exec  Execture any command. Wrapper of 'singularity exec.'"
@@ -84,7 +82,7 @@ fi
 # Ensure that $S9Y_EXEC_CONTAINER is an array
 function _ensure_s9y_exec_options_isarray() {
     if [[ ! "$(declare -p S9Y_EXEC_OPTIONS)" =~ "declare -a" ]]; then
-        abort "S9Y_EXEC_OPTIONS must be array: e.g., S9Y_EXEC_OPTIONS=(-nv)"
+        abort "S9Y_EXEC_OPTIONS must be array: e.g., S9Y_EXEC_OPTIONS=(--nv)"
     fi
 }
 
