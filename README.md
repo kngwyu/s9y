@@ -1,17 +1,19 @@
 # s9y
-s9y is a thin wrapper for [singularity](https://sylabs.io/guides/3.7/user-guide/) container.
+s9y is a thin wrapper for [singularity](https://sylabs.io/singularity-pro/) or [apptainer](http://apptainer.org/).
 
 ## Why?
-For shortening the commands and enabling directory-specific
-configurations of containers, CLI options, and Python virtualenvs.
+For shortening the commands and enabling directory-specific configurations of containers, CLI options, and Python virtualenvs.
 
 ## Install
-`s9y` is a standalone bash script, so simply copy to a directiry in `$PATH`.
+`s9y` is a standalone bash script, so simply copy to a directory in `$PATH`.
 E.g., if you use `$HOME/.local/bin`, run
 `wget -O $HOME/.local/bin/s9y https://git.io/JOsUn && chmod +x $HOME/.local/bin/s9y`.
 
 ### Dependecies
-singularity, bash, and sed
+- `singularity` or `apptainer`
+  - `apptainer` installs a [symlink](https://apptainer.org/docs/user/main/singularity_compatibility.html#singularity-command-symlink) to singularity for backward compatibility.
+- `bash`
+- GNU `sed`
 
 ## Usage
 Place a config file named `.s9y-env` under the directory you want to use
