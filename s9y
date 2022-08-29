@@ -9,18 +9,18 @@ NC="\033[0m"
 
 # Show info
 function info() {
-    echo -e "${BLUE}INFO:${NC} $*"
+        echo -e "${BLUE}INFO:${NC} $*"
 }
 
 # Show warning
 function warn() {
-    echo -e "${YELLOW}WARNING:${NC} $*"
+        echo -e "${YELLOW}WARNING:${NC} $*"
 }
 
 # Exit after showing an error
 function abort() {
-    echo -e "${RED}ERROR:${NC} $*"
-    exit 1
+        echo -e "${RED}ERROR:${NC} $*"
+        exit 1
 }
 
 # Name of this command
@@ -29,25 +29,25 @@ CMD_NAME=$(basename "$0")
 
 # Show help
 function show_help() {
-    echo -e "${BLUE}Usage${NC}: $CMD_NAME <subcommand> [options]\n"
-    if [[ -v S9Y_CONTAINER ]]; then
-        echo "$S9Y_CONTAINER is used as the container."
-    else
-        echo "$CMD_NAME needs S9Y_CONTAINER set."
-        echo "Please set it in .s9y-env or an init file for shell (e.g., .bashrc)"
-    fi
-    echo "Enabled global options: " "${S9Y_GLOBAL_OPTIONS[@]}"
-    echo "Enabled exec options: " "${S9Y_EXEC_OPTIONS[@]}"
-    echo    ""
-    echo -e "${GREEN}Subcommands${NC}:\n"
-    echo    "    exec  Execture any command. Wrapper of 'singularity exec.'"
-    echo    "    shell Enter the login shell of the container. Wrapper of 'singularity shell'."
-    echo    "    py    Execute a Python program, possibly within"
-    echo    "          the virtualenv specified by S9Y_VENV."
-    echo    "    venv  Execute any command (e.g., pip) in the virtualenv."
-    echo    "          Equivalent to '. your-venv/bin/activate && ...'."
-    echo    ""
-    echo    "For help with each subcommand, run $CMD_NAME <subcommand> -h|--help"
+        echo -e "${BLUE}Usage${NC}: $CMD_NAME <subcommand> [options]\n"
+        if [[ -v S9Y_CONTAINER ]]; then
+                echo "$S9Y_CONTAINER is used as the container."
+        else
+                echo "$CMD_NAME needs S9Y_CONTAINER set."
+                echo "Please set it in .s9y-env or an init file for shell (e.g., .bashrc)"
+        fi
+        echo "Enabled global options: " "${S9Y_GLOBAL_OPTIONS[@]}"
+        echo "Enabled exec options: " "${S9Y_EXEC_OPTIONS[@]}"
+        echo ""
+        echo -e "${GREEN}Subcommands${NC}:\n"
+        echo "    exec  Execture any command. Wrapper of 'singularity exec.'"
+        echo "    shell Enter the login shell of the container. Wrapper of 'singularity shell'."
+        echo "    py    Execute a Python program, possibly within"
+        echo "          the virtualenv specified by S9Y_VENV."
+        echo "    venv  Execute any command (e.g., pip) in the virtualenv."
+        echo "          Equivalent to '. your-venv/bin/activate && ...'."
+        echo ""
+        echo "For help with each subcommand, run $CMD_NAME <subcommand> -h|--help"
 }
 
 # First, find .s9y-env and source it
@@ -55,167 +55,167 @@ function show_help() {
 readonly EXECUTING_DIR=$PWD
 
 while [[ $PWD != "/" ]]; do
-    if [[ -f ".s9y-env" ]]; then
-        source ".s9y-env"
-        break
-    fi
-    cd ..
+        if [[ -f ".s9y-env" ]]; then
+                source ".s9y-env"
+                break
+        fi
+        cd ..
 done
 
 if [[ $PWD == "/" ]]; then
-    warn ".s9y-env was not found"
+        warn ".s9y-env was not found"
 fi
 
 cd "$EXECUTING_DIR" || abort "cd failed"
 
 # Show help if no arguments were supplied
 if [[ $# -eq 0 ]]; then
-    show_help
-    exit 0
+        show_help
+        exit 0
 fi
 
 # Ensure that $S9Y_CONTAINER exists
 if [[ ! -v S9Y_CONTAINER ]]; then
-    abort "S9Y_CONTAINER is not set"
+        abort "S9Y_CONTAINER is not set"
 fi
 
 # Ensure that $S9Y_EXEC_CONTAINER is an array
 function _ensure_s9y_exec_options_isarray() {
-    if [[ ! "$(declare -p S9Y_EXEC_OPTIONS)" =~ "declare -a" ]]; then
-        abort "S9Y_EXEC_OPTIONS must be array: e.g., S9Y_EXEC_OPTIONS=(--nv)"
-    fi
+        if [[ ! "$(declare -p S9Y_EXEC_OPTIONS)" =~ "declare -a" ]]; then
+                abort "S9Y_EXEC_OPTIONS must be array: e.g., S9Y_EXEC_OPTIONS=(--nv)"
+        fi
 }
 
 # s9y exec: Wrapper of singularity exec
 function subcmd_exec() {
-    case $1 in "" | "-h" | "--help")  _exec_show_help && exit 0 ;; *) esac
-    if [[ ! -v S9Y_EXEC_OPTIONS ]]; then
-        singularity exec "$S9Y_CONTAINER" "$@" || exit $?
-    else
-        _ensure_s9y_exec_options_isarray
-        singularity exec "${S9Y_EXEC_OPTIONS[@]}" "$S9Y_CONTAINER" "$@" || exit $?
-    fi
+        case $1 in "" | "-h" | "--help") _exec_show_help && exit 0 ;; *) ;; esac
+        if [[ ! -v S9Y_EXEC_OPTIONS ]]; then
+                singularity exec "$S9Y_CONTAINER" "$@" || exit $?
+        else
+                _ensure_s9y_exec_options_isarray
+                singularity exec "${S9Y_EXEC_OPTIONS[@]}" "$S9Y_CONTAINER" "$@" || exit $?
+        fi
 }
 
 # Helper function for venv
 function _venv_exec() {
-    src="source $S9Y_VENV/bin/activate &&"
-    # https://stackoverflow.com/a/8723305
-    for arg in "$@"; do
-        case "$arg" in
-            *\'*)
-                arg=$(printf "%s" "$arg" | sed "s/'/'\"'\"'/g")
-                ;;
-            *) : ;;
-        esac
-        src="$src '$arg'"
-    done
-    subcmd_exec bash -c "$src"
+        src="source $S9Y_VENV/bin/activate &&"
+        # https://stackoverflow.com/a/8723305
+        for arg in "$@"; do
+                case "$arg" in
+                *\'*)
+                        arg=$(printf "%s" "$arg" | sed "s/'/'\"'\"'/g")
+                        ;;
+                *) : ;;
+                esac
+                src="$src '$arg'"
+        done
+        subcmd_exec bash -c "$src"
 }
 
 function _exec_show_help() {
-    echo -e "${BLUE}Usage${NC}: $CMD_NAME exec [commands] [arguments]\n"
-    echo    "Execture any command. Wrapper of 'singularity exec.'"
+        echo -e "${BLUE}Usage${NC}: $CMD_NAME exec [commands] [arguments]\n"
+        echo "Execture any command. Wrapper of 'singularity exec.'"
 }
 
 # s9y python: Execute Python, possibly with virtual env
 function subcmd_python() {
-    case $1 in "-h" | "--help")  _py_show_help && exit 0 ;; *) esac
-    if [ -v S9Y_PYTHON ]; then
-        python=$S9Y_PYTHON
-    else
-        python="python"
-    fi
+        case $1 in "-h" | "--help") _py_show_help && exit 0 ;; *) ;; esac
+        if [ -v S9Y_PYTHON ]; then
+                python=$S9Y_PYTHON
+        else
+                python="python"
+        fi
 
-    if [ -v S9Y_VENV ]; then
-        info "S9Y_VENV found, using $S9Y_VENV for executing a Python script"
-        src="source $S9Y_VENV/bin/activate && python"
-        _venv_exec $python "$@"
-    else
-        warn "S9Y_VENV was not found.\n        " \
-             "Executing a Python script without a virtualenv can affect" \
-             "your local environment."
-        subcmd_exec $python "$@"
-    fi
+        if [ -v S9Y_VENV ]; then
+                info "S9Y_VENV found, using $S9Y_VENV for executing a Python script"
+                src="source $S9Y_VENV/bin/activate && python"
+                _venv_exec $python "$@"
+        else
+                warn "S9Y_VENV was not found.\n        " \
+                        "Executing a Python script without a virtualenv can affect" \
+                        "your local environment."
+                subcmd_exec $python "$@"
+        fi
 }
 
 function _py_show_help() {
-    echo -e "${BLUE}Usage${NC}: $CMD_NAME py [options] [filename]\n"
-    echo    "Execute a Python program, possibly within the virtualenv specified by S9Y_VENV."
+        echo -e "${BLUE}Usage${NC}: $CMD_NAME py [options] [filename]\n"
+        echo "Execute a Python program, possibly within the virtualenv specified by S9Y_VENV."
 }
 
 # s9y shell: Wrapper of singularity shell
 function subcmd_shell() {
-    case $1 in "-h" | "--help")  _exec_show_help && exit 0 ;; *) esac
-    if [[ ! -v S9Y_EXEC_OPTIONS ]]; then
-        singularity shell "$S9Y_CONTAINER" "$@" || exit $?
-    else
-        _ensure_s9y_exec_options_isarray
-        singularity shell "${S9Y_EXEC_OPTIONS[@]}" "$S9Y_CONTAINER" "$@" || exit $?
-    fi
+        case $1 in "-h" | "--help") _exec_show_help && exit 0 ;; *) ;; esac
+        if [[ ! -v S9Y_EXEC_OPTIONS ]]; then
+                singularity shell "$S9Y_CONTAINER" "$@" || exit $?
+        else
+                _ensure_s9y_exec_options_isarray
+                singularity shell "${S9Y_EXEC_OPTIONS[@]}" "$S9Y_CONTAINER" "$@" || exit $?
+        fi
 }
 
 function _shell_show_help() {
-    echo -e "${BLUE}Usage${NC}: $CMD_NAME shell \n"
-    echo    "Enter the login shell of the container."
+        echo -e "${BLUE}Usage${NC}: $CMD_NAME shell \n"
+        echo "Enter the login shell of the container."
 }
 
 # s9y venv: Execute Python, possibly with virtual env
 function subcmd_venv() {
-    case $1 in
+        case $1 in
         "" | "-h" | "--help")
-            _venv_show_help
-            ;;
+                _venv_show_help
+                ;;
         "-c" | "--create")
-            shift
-            _venv_create "$@"
-            ;;
+                shift
+                _venv_create "$@"
+                ;;
         *)
-            if [[ ! -v S9Y_VENV ]]; then
-                abort "$CMD_NAME venv needs S9Y_VENV set."
-            fi
-            info "S9Y_VENV found, using $S9Y_VENV for executing a command"
-            _venv_exec "$@"
-            ;;
-    esac
+                if [[ ! -v S9Y_VENV ]]; then
+                        abort "$CMD_NAME venv needs S9Y_VENV set."
+                fi
+                info "S9Y_VENV found, using $S9Y_VENV for executing a command"
+                _venv_exec "$@"
+                ;;
+        esac
 }
 
 function _venv_create() {
-    if [[ -v S9Y_VENV ]]; then
-        if [[ -d $S9Y_VENV ]]; then
-            abort "$S9Y_VENV already exists. Manually delete the directory first."
+        if [[ -v S9Y_VENV ]]; then
+                if [[ -d $S9Y_VENV ]]; then
+                        abort "$S9Y_VENV already exists. Manually delete the directory first."
+                fi
+                info "Creating Python virtual env $S9Y_VENV"
+                if [[ ! "$*" =~ "--system-site-packages" ]]; then
+                        warn "--system-site-packages is not used," \
+                                "so the resulting venv cannot access to system packages"
+                fi
+                subcmd_exec python -m venv "$S9Y_VENV" "$@"
+        else
+                abort "Specify the name of venv by S9Y_VENV."
         fi
-        info "Creating Python virtual env $S9Y_VENV"
-        if [[ ! "$*" =~ "--system-site-packages"  ]]; then
-            warn "--system-site-packages is not used," \
-                 "so the resulting venv cannot access to system packages"
-        fi
-        subcmd_exec python -m venv "$S9Y_VENV" "$@"
-    else
-        abort "Specify the name of venv by S9Y_VENV."
-    fi
 }
 
 function _venv_show_help() {
-    echo -e "${BLUE}Usage${NC}: $CMD_NAME venv --help / --create / [commands] [arguments]\n"
-    echo    "Execute a command in a virtualenv."
-    echo -e "${GREEN}Options${NC}: \n"
-    echo    "    -h/--help Show help."
-    echo    "    -c/--create Create a virtual env."
-    echo    "                The name of the virtualenv must be specified by S9Y_VENV."
+        echo -e "${BLUE}Usage${NC}: $CMD_NAME venv --help / --create / [commands] [arguments]\n"
+        echo "Execute a command in a virtualenv."
+        echo -e "${GREEN}Options${NC}: \n"
+        echo "    -h/--help Show help."
+        echo "    -c/--create Create a virtual env."
+        echo "                The name of the virtualenv must be specified by S9Y_VENV."
 }
 
 # Entry point: dispatch to any of sub command
 readonly SUB_CMD=$1
 case $SUB_CMD in
-    "" | "-h" | "--help")
+"" | "-h" | "--help")
         show_help
         ;;
-    *)
+*)
         shift
         subcmd_"${SUB_CMD}" "$@"
         if [ $? = 127 ]; then
-            abort "$SUB_CMD is not a known subcommand. Run $CMD_NAME --help for usage."
+                abort "$SUB_CMD is not a known subcommand. Run $CMD_NAME --help for usage."
         fi
         ;;
 esac
