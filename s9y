@@ -24,8 +24,7 @@ function abort() {
 }
 
 # Name of this command
-readonly CMD_NAME
-CMD_NAME=$(basename "$0")
+readonly CMD_NAME=$(basename "$0")
 
 # Show help
 function show_help() {
