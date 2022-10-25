@@ -73,6 +73,12 @@ if [[ $# -eq 0 ]]; then
         exit 0
 fi
 
+# Override variables
+for override_var in $((set -o posix; set) | grep S9Y_OVERRIDE_*); do
+    export "S9Y_${override_var:13}"
+    info "S9Y_${override_var:13} is overridden"
+done
+
 # Ensure that $S9Y_CONTAINER exists
 if [[ ! -v S9Y_CONTAINER ]]; then
         abort "S9Y_CONTAINER is not set"
