@@ -36,6 +36,8 @@ helpful to use an SSH agent from a container.
 
 Then, you can use `s9y` under the all child directries.
 
+Note that you can override these env vars by setting `S9Y_OVERRIDE_*`.
+
 ```bash
 ❯ s9y venv --create --system-site-packages
 INFO: Creating Python virtual env .my-venv
