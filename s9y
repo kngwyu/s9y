@@ -78,6 +78,11 @@ if [[ ! -v S9Y_CONTAINER ]]; then
         abort "S9Y_CONTAINER is not set"
 fi
 
+# Set Python
+if [[ ! -v S9Y_PYTHON ]]; then
+    S9Y_PYTHON="python"
+fi
+
 # Ensure that $S9Y_EXEC_CONTAINER is an array
 function _ensure_s9y_exec_options_isarray() {
         if [[ ! "$(declare -p S9Y_EXEC_OPTIONS)" =~ "declare -a" ]]; then
@@ -120,21 +125,15 @@ function _exec_show_help() {
 # s9y python: Execute Python, possibly with virtual env
 function subcmd_python() {
         case $1 in "-h" | "--help") _py_show_help && exit 0 ;; *) ;; esac
-        if [ -v S9Y_PYTHON ]; then
-                python=$S9Y_PYTHON
-        else
-                python="python"
-        fi
-
         if [ -v S9Y_VENV ]; then
                 info "S9Y_VENV found, using $S9Y_VENV for executing a Python script"
                 src="source $S9Y_VENV/bin/activate && python"
-                _venv_exec $python "$@"
+                _venv_exec $S9Y_PYTHON "$@"
         else
                 warn "S9Y_VENV was not found.\n        " \
                         "Executing a Python script without a virtualenv can affect" \
                         "your local environment."
-                subcmd_exec $python "$@"
+                subcmd_exec $S9Y_PYTHON "$@"
         fi
 }
 
@@ -189,7 +188,7 @@ function _venv_create() {
                         warn "--system-site-packages is not used," \
                                 "so the resulting venv cannot access to system packages"
                 fi
-                subcmd_exec python -m venv "$S9Y_VENV" "$@"
+                subcmd_exec $S9Y_PYTHON -m venv "$S9Y_VENV" "$@"
         else
                 abort "Specify the name of venv by S9Y_VENV."
         fi
