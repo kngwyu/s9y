@@ -131,14 +131,22 @@ function _exec_show_help() {
 # s9y python: Execute Python, possibly with virtual env
 function subcmd_python() {
         case $1 in "-h" | "--help") _py_show_help && exit 0 ;; *) ;; esac
-        if [ -v S9Y_VENV ]; then
-                info "S9Y_VENV found, using $S9Y_VENV for executing a Python script"
-                src="source $S9Y_VENV/bin/activate && python"
-                _venv_exec $S9Y_PYTHON "$@"
+        if [[ -v S9Y_VENV ]]; then
+                if [[ ! -f $S9Y_VENV/bin/activate ]]; then
+                    warn "S9Y_VENV found, but $S9Y_VENV/bin/activate does not exist.\n" \
+                        "Executing a Python script outside a virtualenv can affect" \
+                        "your local Python environment. \n" \
+                        "Run s9y venv --create fist to create the virtualenv."
+                    subcmd_exec $S9Y_PYTHON "$@"
+                else
+                    info "S9Y_VENV found, using $S9Y_VENV for executing a Python script"
+                    src="source $S9Y_VENV/bin/activate && python"
+                    _venv_exec $S9Y_PYTHON "$@"
+                fi
         else
                 warn "S9Y_VENV was not found.\n        " \
                         "Executing a Python script without a virtualenv can affect" \
-                        "your local environment."
+                        "your local Python environment."
                 subcmd_exec $S9Y_PYTHON "$@"
         fi
 }
